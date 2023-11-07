@@ -1,0 +1,42 @@
+.menuBurger{
+  height: 3.5rem !important;
+  top: 0.5vmax !important;
+  left: 0.5vmax !important;
+  width: 2.5vmax !important;
+  z-index: 9999 !important;
+}
+
+.speedDial{
+  position: fixed;
+  right: 2vmax;
+  top: 2vmax;
+  z-index: 11 !important;
+}
+
+.speedDialIcon{
+  width: 56px;
+  height: 56px;
+  border-radius: 100%;
+}
+
+
+@media screen and (max-width:800px) {
+  .logoReactNavbar{
+    width: 100% !important;
+  }
+  .linksReactNavbar{
+    font-size: 1vmax !important;
+  }
+}
+
+
+
+@media screen and (max-width:1250px) {
+  .menuBurger{
+    height: 28px !important;
+    top: 1vmax !important;
+    left: 1vmax !important;
+    width: 2.5vmax !important;
+    z-index: 9999 !important;
+  }
+}

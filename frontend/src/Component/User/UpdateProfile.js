@@ -1,0 +1,119 @@
+import React,{useEffect, useState} from 'react'
+import Loader from '../Layout/Loader/Loader'
+import MetaData from "../Layout/MetaData";
+import MailOutlineIcon from "@material-ui/icons/MailOutline"
+import FaceIcon from "@material-ui/icons/Face"
+import "./UpdateProfile.css";
+import {useSelector,useDispatch} from "react-redux";
+import {clearErrors, loadUser, updateProfile} from "../../actions/useraction";
+import {useAlert} from "react-alert"
+import { UPDATE_PROFILE_RESET } from '../../constants/userConstants'
+import { useNavigate } from 'react-router-dom';
+
+const UpdateProfile = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const alert = useAlert();
+    const {userData} = useSelector(state => state?.user);
+    const {error, isUpdated, loading} = useSelector(state=>state?.profile);
+    
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+
+    const [avatar,setAvatar] = useState();
+    const [avatarPreview,setAvatarPreview] = useState("/Profile.png");
+
+    const updateProfileSubmit = (e) => {
+        e.preventDefault();
+        const myForm = new FormData();
+        myForm.set("name", name);
+        myForm.set("email", email);
+        myForm.set("avatar", avatar);
+
+        dispatch(updateProfile(myForm));
+    }
+
+    const updateProfileDataChange = (e) => {
+            const reader = new FileReader();
+            reader.onload = () =>{
+                if(reader.readyState === 2){
+                    setAvatarPreview(reader.result);
+                    setAvatar(reader.result);
+                }
+            }
+            reader.readAsDataURL(e.target.files[0]);
+    }
+
+    useEffect(()=>{
+
+        if(userData){
+            setName(userData?.name);
+            setEmail(userData?.email);
+            setAvatarPreview(userData?.avatar?.url);
+        }
+
+        if(error){
+            alert.error(error);
+            dispatch(clearErrors());
+        }
+
+        if(isUpdated){
+            alert.success("Profile Updated Successfully");
+            dispatch(loadUser());
+            navigate("/account");
+            dispatch({
+                type: UPDATE_PROFILE_RESET,
+            })
+        }
+
+    },[dispatch,alert,error,userData,isUpdated,navigate])
+
+  return (
+    <>
+        {
+            loading ? <Loader/> : <>
+                <MetaData title="Update Profile" />
+                <div className='updateProfileContainer'>
+                    <div className='updateProfileBox'>
+                    <h2 className='updateProfileHeading'>Update Profile</h2>
+                    <form className='updateProfileForm' encType='multipart/form-data' onSubmit={updateProfileSubmit}>
+                        
+                        <div className='updateProfileName'>
+                            <FaceIcon />
+                            <input type="text"
+                            placeholder='Username'
+                            required
+                            name='name'
+                            value={name}
+                            onChange={(e)=>{setName(e.target.value)}}
+                            />
+                        </div>
+
+                        <div className='updateProfileEmail'>
+                            <MailOutlineIcon />
+                            <input type="email"
+                            placeholder='Email'
+                            required
+                            name='email'
+                            value={email}
+                            onChange={(e)=>{setEmail(e.target.value)}}
+                            />
+                        </div>
+
+
+                        <div id='updateProfileImage'>
+                            <img src={avatarPreview} alt="Avatar Preview" />
+                            <input type="file" name='avatar' accept='image/*' onChange={updateProfileDataChange} />
+                        </div>
+
+                        <input type="submit" value="UPDATE" className='updateProfileBtn' />
+                    </form>
+                    </div>
+                </div>
+            </>
+        }
+    </>
+  )
+}
+
+export default UpdateProfile
